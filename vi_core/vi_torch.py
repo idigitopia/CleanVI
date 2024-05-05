@@ -103,7 +103,7 @@ class MDP_CORE():
 
 
 if __name__ == "__main__":
-    from env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
+    from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Solve MDP for Frozen Lake environment.')
