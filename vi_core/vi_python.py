@@ -78,14 +78,9 @@ class MDP_CORE():
         self.V = [0.0 for _ in range(nn)]
         self.Pi = [0 for _ in range(nn)]
 
-if __name__ == "__main__":
-    from env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
-    parser = argparse.ArgumentParser(description='Solve MDP for a simulated Frozen Lake environment.')
-    parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
-    parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
-    parser.add_argument("--headless", action="store_true", help="Run in headless mode")
-    args = parser.parse_args()
+def main(args):
+    from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Define Environment
     env = FrozenLakeEnvDynamic(map_size=tuple(args.map_size), h_prob=args.h_prob)
@@ -101,3 +96,11 @@ if __name__ == "__main__":
     
     if not args.headless:
         plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Solve MDP for a simulated Frozen Lake environment.')
+    parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
+    parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
+    parser.add_argument("--headless", action="store_true", help="Run in headless mode")
+    args = parser.parse_args()
+    main(args)
