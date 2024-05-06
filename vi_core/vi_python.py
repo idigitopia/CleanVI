@@ -79,11 +79,12 @@ class MDP_CORE():
         self.Pi = [0 for _ in range(nn)]
 
 if __name__ == "__main__":
-    from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
+    from env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     parser = argparse.ArgumentParser(description='Solve MDP for a simulated Frozen Lake environment.')
     parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
     parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
+    parser.add_argument("--headless", action="store_true", help="Run in headless mode")
     args = parser.parse_args()
 
     # Define Environment

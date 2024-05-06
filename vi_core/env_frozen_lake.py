@@ -8,7 +8,6 @@ import numpy as np
 from collections import namedtuple
 import time
 from tqdm import tqdm
-import torch 
 
 class FrozenLakeEnvDynamic():
 
