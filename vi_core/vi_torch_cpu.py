@@ -103,12 +103,13 @@ class MDP_CORE():
 
 
 if __name__ == "__main__":
-    from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
+    from env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Solve MDP for Frozen Lake environment.')
     parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map (default: [200, 200])')
     parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole (default: 0.05)')
+    parser.add_argument("--headless", action="store_true", help="Run in headless mode")
     args = parser.parse_args()
 
     # Define Environment
@@ -124,4 +125,5 @@ if __name__ == "__main__":
     mdp.solve(gamma=0.9975, verbose=True, max_n_backups=10000, 
             bellman_backup_batch_size=25)
 
-    plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
+    if not args.headless:
+        plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)

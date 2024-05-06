@@ -97,5 +97,6 @@ if __name__ == "__main__":
     mdp.Ti, mdp.Tp, mdp.R = Ti, Tp, Tr
     mdp.solve(gamma=0.9975, verbose=True, max_n_backups=10000, 
            bellman_backup_batch_size=25)
-
-    plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
+    
+    if not args.headless:
+        plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
