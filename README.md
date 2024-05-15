@@ -20,6 +20,20 @@ The benchmark script will solve the MDP for the Frozen Lake environment using th
 If not running in headless mode, the script will also plot the optimal policy and value function for the solved MDP
 
 
+### Hardware Support 
+
+The MDP solver has been implemented on different hardware types and frameworks. 
+
+- CPU
+  - [X] Pure Python
+  - [X] Numpy
+  - [X] Torch
+- GPU
+  - [X] Torch (NVIDIA)
+  - [X] MLX (APPLE)
+  - [ ] Jax (NVIDIA)
+  - [ ] CUDA Kernel (NVIDIA)
+
 
 ## Benchmark Results
 
