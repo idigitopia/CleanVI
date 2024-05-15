@@ -2,34 +2,36 @@ import jax.numpy as jnp
 import time
 from tqdm import tqdm
 import argparse
+import sys 
+import os
 
 class MDP_CORE():
 
     def bellman_backup_operator(Ti, Tp, R, Q, V, gamma):
-        Q = np.sum(np.multiply(R, Tp), axis=2) + \
-            gamma * np.sum(np.multiply(Tp, V[Ti]), axis=2)
-        V_prime = np.max(Q, axis=1)
-        Pi = np.argmax(Q, axis=1)
+        Q = jnp.sum(jnp.multiply(R, Tp), axis=2) + \
+            gamma * jnp.sum(jnp.multiply(Tp, V[Ti]), axis=2)
+        V_prime = jnp.max(Q, axis=1)
+        Pi = jnp.argmax(Q, axis=1)
         return Q, Pi, V_prime
 
     def bellman_backup_operator_with_eps(Ti, Tp, R, Q, V, gamma):
-        Q = np.sum(np.multiply(R, Tp), axis=2) + \
-            gamma * np.sum(np.multiply(Tp, V[Ti]), axis=2)
-        V_prime = np.max(Q, axis=1)
-        Pi = np.argmax(Q, axis=1)
-        epsilon = np.max(np.abs(V_prime - V))
+        Q = jnp.sum(jnp.multiply(R, Tp), axis=2) + \
+            gamma * jnp.sum(jnp.multiply(Tp, V[Ti]), axis=2)
+        V_prime = jnp.max(Q, axis=1)
+        Pi = jnp.argmax(Q, axis=1)
+        epsilon = jnp.max(jnp.abs(V_prime - V))
         return epsilon, Q, Pi, V_prime
 
     def __init__(self, n_states, n_tran_types, n_tran_targets):
         nn, aa, tt = n_states, n_tran_types, n_tran_targets
-        self.S = np.arange(nn).astype(np.int64)
+        self.S = jnp.arange(nn).astype(jnp.int64)
 
-        self.Ti = np.zeros((nn, aa, tt), dtype=np.int64)
-        self.Tp = np.zeros((nn, aa, tt), dtype=np.float32)
-        self.R = np.zeros((nn, aa, tt), dtype=np.float32)
-        self.Q = np.zeros((nn, aa), dtype=np.float32)
-        self.V = np.zeros(nn, dtype=np.float32)
-        self.Pi = np.zeros(nn, dtype=np.int64)
+        self.Ti = jnp.zeros((nn, aa, tt), dtype=jnp.int64)
+        self.Tp = jnp.zeros((nn, aa, tt), dtype=jnp.float32)
+        self.R = jnp.zeros((nn, aa, tt), dtype=jnp.float32)
+        self.Q = jnp.zeros((nn, aa), dtype=jnp.float32)
+        self.V = jnp.zeros(nn, dtype=jnp.float32)
+        self.Pi = jnp.zeros(nn, dtype=jnp.int64)
 
         self.gamma = 0.99
 
@@ -62,16 +64,23 @@ class MDP_CORE():
         
         et = time.time()
         if verbose:
-            print(f"Solved MDP in {i} Backups, {et-st:.2f} Seconds, Eps: {self.curr_error}")
+            GREEN = '\033[92m'
+            RESET = '\033[0m'
+            print(f"Solved MDP in {i} Backups, {GREEN}{et-st:.2f} Seconds{RESET}, Eps: {self.curr_error}")
+
 
 
     def reset_value_vectors(self):
         nn, aa, tt = self.Ti.shape
-        self.Q = np.zeros((nn, aa), dtype=np.float32)
-        self.V = np.zeros(nn, dtype=np.float32)
-        self.Pi = np.zeros(nn, dtype=np.int64)
+        self.Q = jnp.zeros((nn, aa), dtype=jnp.float32)
+        self.V = jnp.zeros(nn, dtype=jnp.float32)
+        self.Pi = jnp.zeros(nn, dtype=jnp.int64)
 
 def main(args):
+    sys.path.append(os.getcwd())
+    
+    print("#### Benchmarking MDP Solver for JAX GPU ####")
+    
     from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Define Environment
@@ -83,7 +92,7 @@ def main(args):
                 n_tran_types=len(env.all_actions), 
                 n_tran_targets=4, # max number of states tran prob can be non-zero 
                 )
-    mdp.Ti[:], mdp.Tp[:], mdp.R[:] = np.array(Ti), np.array(Tp), np.array(Tr)
+    mdp.Ti[:], mdp.Tp[:], mdp.R[:] = jnp.array(Ti), jnp.array(Tp), jnp.array(Tr)
     mdp.solve(gamma=0.9975, verbose=True, max_n_backups=10000, 
             bellman_backup_batch_size=25)
 

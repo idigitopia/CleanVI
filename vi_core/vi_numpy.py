@@ -2,7 +2,8 @@ import numpy as np
 import time
 from tqdm import tqdm
 import argparse
-
+import sys 
+import os
 class MDP_CORE():
 
     def bellman_backup_operator(Ti, Tp, R, Q, V, gamma):
@@ -62,8 +63,11 @@ class MDP_CORE():
         
         et = time.time()
         if verbose:
-            print(f"Solved MDP in {i} Backups, {et-st:.2f} Seconds, Eps: {self.curr_error}")
-
+            GREEN = '\033[92m'
+            RESET = '\033[0m'
+            print(f"Solved MDP in {i} Backups, {GREEN}{et-st:.2f} Seconds{RESET}, Eps: {self.curr_error}")
+   
+        return {"Time Elapsed": et-st, "Backups": i, "Error": self.curr_error}
 
     def reset_value_vectors(self):
         nn, aa, tt = self.Ti.shape
@@ -72,6 +76,10 @@ class MDP_CORE():
         self.Pi = np.zeros(nn, dtype=np.int64)
 
 def main(args):
+    sys.path.append(os.getcwd())
+    
+    print("#### Benchmarking MDP Solver for Numpy CPU ####")
+    
     from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Define Environment
@@ -84,11 +92,16 @@ def main(args):
                 n_tran_targets=4, # max number of states tran prob can be non-zero 
                 )
     mdp.Ti[:], mdp.Tp[:], mdp.R[:] = np.array(Ti), np.array(Tp), np.array(Tr)
-    mdp.solve(gamma=0.9975, verbose=True, max_n_backups=10000, 
-            bellman_backup_batch_size=25)
+    result_dict = mdp.solve(gamma=args.gamma,
+                            verbose=True, 
+                            max_n_backups=10000, 
+                            bellman_backup_batch_size=25)
+
 
     if not args.headless:
         plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
+
+    return result_dict
 
         
 if __name__ == "__main__":
@@ -96,5 +109,7 @@ if __name__ == "__main__":
     parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
     parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
     parser.add_argument("--headless", action="store_true", help="Run in headless mode")
+    parser.add_argument("--gamma", type=float, default=0.99, help='Discount Factor')
+    parser.add_argument("--epsilon", type=float, default=0.001, help='Residual error to end Value iteration')
     args = parser.parse_args()
     main(args)

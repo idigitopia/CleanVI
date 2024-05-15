@@ -2,6 +2,8 @@ import mlx.core as mx
 import time
 from tqdm import tqdm
 import argparse
+import sys 
+import os
 
 class MDP_CORE():
 
@@ -62,7 +64,11 @@ class MDP_CORE():
         
         et = time.time()
         if verbose:
-            print(f"Solved MDP in {i} Backups, {et-st:.2f} Seconds, Eps: {self.curr_error}")
+            GREEN = '\033[92m'
+            RESET = '\033[0m'
+            print(f"Solved MDP in {i} Backups, {GREEN}{et-st:.2f} Seconds{RESET}, Eps: {self.curr_error}")
+
+            
 
 
     def reset_value_vectors(self):
@@ -73,6 +79,10 @@ class MDP_CORE():
 
 
 def main(args):
+    sys.path.append(os.getcwd())
+    
+    print("#### Benchmarking MDP Solver for MLX Apple GPU ####")
+    
     from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Define Environment
@@ -93,7 +103,7 @@ def main(args):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Solve MDP for Frozen Lake environment.')
+    parser = argparse.ArgumentParser(description='Solve MDP for Froen Lake environment.')
     parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
     parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
     parser.add_argument("--headless", action="store_true", help="Run in headless mode")

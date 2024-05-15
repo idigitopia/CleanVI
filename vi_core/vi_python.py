@@ -1,6 +1,8 @@
 import time
 from tqdm import tqdm
 import argparse
+import os 
+import sys
 
 class MDP_CORE():
 
@@ -72,6 +74,9 @@ class MDP_CORE():
         if verbose:
             print(f"Solved MDP in {i} Backups, {et-st:.2f} Seconds, Eps: {self.curr_error}")
 
+        return {"Time Elapsed": et-st, "Backups": i, "Error": self.curr_error}
+
+
     def reset_value_vectors(self):
         nn, aa = len(self.Ti), len(self.Ti[0])
         self.Q = [[0.0]*aa for _ in range(nn)]
@@ -80,6 +85,10 @@ class MDP_CORE():
 
 
 def main(args):
+    sys.path.append(os.getcwd())
+    
+    print("#### Benchmarking MDP Solver for Pure Python ####")
+    
     from vi_core.env_frozen_lake import FrozenLakeEnvDynamic, plot_policy_image
 
     # Define Environment
@@ -91,16 +100,22 @@ def main(args):
                n_tran_types=len(env.all_actions), 
                n_tran_targets=4) 
     mdp.Ti, mdp.Tp, mdp.R = Ti, Tp, Tr
-    mdp.solve(gamma=0.9975, verbose=True, max_n_backups=10000, 
-           bellman_backup_batch_size=25)
+    result_dict = mdp.solve(gamma=args.gamma,
+                            verbose=True, 
+                            max_n_backups=10000, 
+                            bellman_backup_batch_size=25)
     
     if not args.headless:
         plot_policy_image(mdp.V, mdp.Pi, env.map_grid, show_policy= env.map_size[0]<50)
 
+    return result_dict
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Solve MDP for a simulated Frozen Lake environment.')
+    parser = argparse.ArgumentParser(description='Solve MDP for Frozen Lake environment.')
     parser.add_argument('--map_size', type=int, nargs=2, default=[25, 25], help='Size of the map')
     parser.add_argument('--h_prob', type=float, default=0.05, help='Probability of a hole')
     parser.add_argument("--headless", action="store_true", help="Run in headless mode")
+    parser.add_argument("--gamma", type=float, default=0.99, help='Discount Factor')
+    parser.add_argument("--epsilon", type=float, default=0.001, help='Residual error to end Value iteration')
     args = parser.parse_args()
     main(args)
