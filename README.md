@@ -1,5 +1,5 @@
 # CleanVI : MDP Solver Benchmark
-## Clean Single File Implementation of Value Iteration
+``` Clean Single File Implementations of Value Iteration Across Frameworks and Hardware ```
 
 
 This repository contains code for single file implementations for benchmarking an MDP (Markov Decision Process) solver. The solvers are tested on the Frozen Lake environment, which is a dynamic grid-based environment with configurable map size and probability of holes.
